@@ -1,9 +1,22 @@
 const express = require('express');
 const app = express();
 
-const port = 3000
+const port = 3000;
 
-app.use(express.json())
+app.use(express.json());
+app.use((req, res, next) => {
+    console.log('this is a global mw');
+    next()
+});
+app.use('/clients', (req, res, next) => {
+    console.log('you are accessing clients mw');
+    next();
+});
+
+const localMw = (req, res, next) => {
+    console.log('this is a local mw');
+    next();
+}
 
 const clients = {
     c1: {
@@ -16,6 +29,17 @@ const clients = {
 app.get('/clients', (req, res) => {
     res.status(200).json({
         clients,
+        message: 'Here is the client list'
+    });
+});
+
+app.get('/clients/:id',
+    localMw,
+    (req, res) => {
+    const clientId = req.params.id;
+    const client = clients[clientId];
+    res.status(200).json({
+        client,
         message: 'Here is the client list'
     });
 });
