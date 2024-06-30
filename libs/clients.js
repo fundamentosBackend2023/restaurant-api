@@ -1,9 +1,20 @@
-const clients = {
-    c1: {
-        firstName: 'Miriam',
-        lastName: 'Hernandez',
-        spentAmount: '500'
-    }
-}
+const {Schema, model} = require('mongoose');
 
-module.exports = clients
+const clientSchema = new Schema({
+    firstName: {
+        type: String,
+        required: true
+    },
+    lastName: {
+        type: String,
+        required: true
+    },
+    spentAmount: {
+        type: Number,
+        min: 100
+    }
+});
+
+const clientModel = model('clients', clientSchema);
+
+module.exports = clientModel;

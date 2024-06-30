@@ -3,6 +3,11 @@ const app = express();
 
 const configureRoutes = require('./routes');
 const { globalMw } = require('./middlewares/exampleMW');
+const connectToMongo = require('./libs/mongo')
+const { logger, boomErrorHandler,
+        mongooseErrorHandler,
+        generalErrorHandler
+    } = require('./middlewares/errorHandlers');
 
 const port = process.env.PORT
 
@@ -14,6 +19,12 @@ app.use(globalMw);
 // });
 
 configureRoutes(app);
+connectToMongo()
+
+app.use(logger);
+app.use(boomErrorHandler);
+app.use(mongooseErrorHandler);
+app.use(generalErrorHandler);
 
 
 app.get('/', (req, res) => {

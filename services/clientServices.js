@@ -1,31 +1,37 @@
-const clients = require('../libs/clients');
+const clientDB = require('../libs/clients');
+const boom = require('@hapi/boom');
 
 class Client {
     constructor(){}
 
-    static getAll(){
-        const myClients = clients;
+    static async getAll(){
+        const myClients = await clientDB.find();
         return myClients;
     }
 
-    static getOne(clientId){
-        const client = clients[clientId];
+    static async getOne(clientId){
+        const client = await clientDB.findById(clientId);
+        if(!client){
+            throw boom.notFound('client not found');
+        }
         return client;
     }
 
-    static create(info){
-        const clientsAmount =  (Object.keys(clients)).length + 1;
-        clients[clientsAmount] = info;
+    static async create(info){
+        const client = new clientDB(info);
+        await client.save()
         return true;
     }
 
-    static updateFirstName(clientId, firstName){
-        clients[clientId].firstName = firstName;
+    static async updateFirstName(clientId, firstName){
+        const client = await this.getOne(clientId);
+        client.firstName = firstName;
+        await client.save();
         return true;
     }
 
-    static remove(clientId){
-        delete clients[clientId];
+    static async remove(clientId){
+        await clientDB.findByIdAndDelete(clientId)
         return true;
     }
 
